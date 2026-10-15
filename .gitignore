@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+.ipynb_checkpoints/
+.env
+.env.*
+data/raw/sell_prices.csv
+data/raw/sales_train_evaluation.csv
+data/raw/sales_train_validation.csv
+data/raw/sample_submission.csv
