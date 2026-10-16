@@ -277,38 +277,31 @@ st.markdown("""
 # st.success("SalesPulse AI is running!")
 
 
-MODEL_PATH = "C:\\Users\\Admin\\OneDrive\\Desktop\\SalesPulse-AI\\final_models\\salespulse_final_model.pkl"
-FEATURES_PATH = "C:\\Users\\Admin\\OneDrive\\Desktop\\SalesPulse-AI\\final_models\\salespulse_features.pkl"
+from pathlib import Path
+import joblib
+import pandas as pd
 
+# Find the main SalesPulse-AI folder
+BASE_DIR = Path(__file__).resolve().parent.parent
 
+# File paths
+MODEL_PATH = BASE_DIR / "final_models" / "salespulse_final_model.pkl"
+FEATURES_PATH = BASE_DIR / "final_models" / "salespulse_features.pkl"
+SALES_PATH = BASE_DIR / "data" / "processed" / "daily_sales.csv"
+CALENDAR_PATH = BASE_DIR / "data" / "raw" / "calendar.csv"
 
-# load model
+# Load model and features
 final_model = joblib.load(MODEL_PATH)
 features = joblib.load(FEATURES_PATH)
-SALES_PATH = "C:\\Users\\Admin\\OneDrive\\Desktop\\SalesPulse-AI\\data\\raw\\sales_train_evaluation.csv"
-CALENDAR_PATH = "C:\\Users\\Admin\\OneDrive\\Desktop\\SalesPulse-AI\\data\\raw\\calendar.csv"
 
-
-
-# load data
+# Load data
 sales = pd.read_csv(SALES_PATH)
+sales["date"] = pd.to_datetime(sales["date"])
+
+daily_sales = sales[["date", "total_sales"]].copy()
+daily_sales = daily_sales.sort_values("date").reset_index(drop=True)
+
 calendar = pd.read_csv(CALENDAR_PATH)
-
-calendar["date"] = pd.to_datetime(calendar["date"])
-
-
-sales_cols = [
-    col for col in sales.columns
-    if col.startswith("d_")
-]
-
-daily_totals = sales[sales_cols].sum(axis=0)
-
-daily_sales = pd.DataFrame({
-    "d": daily_totals.index,
-    "total_sales": daily_totals.values
-})
-
 
 
 calendar["is_event_day"] = (
@@ -318,15 +311,12 @@ calendar["is_event_day"] = (
 
 
 
-daily_sales = daily_sales.merge(
-    calendar,
-    on="d",
-    how="left"
-)
+# daily_sales = daily_sales.merge(
+#     calendar,
+#     on="d",
+#     how="left"
 
-daily_sales = daily_sales.sort_values(
-    "date"
-).reset_index(drop=True)
+
 
 def forecast_future_sales(start_date, days):
 
@@ -485,18 +475,23 @@ if page == "Sales Forecast":
         st.markdown(
             '<div class="section-title">Sales Forecast</div>',
             unsafe_allow_html=True
-        )
-
+                )
         # Last date with actual sales
-        sales_last_date = pd.to_datetime(
-            daily_sales["date"].max()
-        ).date()
-
+        daily_sales["date"] = pd.to_datetime(
+            daily_sales["date"], errors="coerce"
+        )
+        sales_dates = pd.to_datetime(
+            daily_sales["date"], errors="coerce"
+        ).dropna()
         # Last date available in calendar
-        calendar_last_date = pd.to_datetime(
-            calendar["date"].max()
-        ).date()
+        calendar["date"] = pd.to_datetime(
+            calendar["date"], errors="coerce"
+        )
+        calendar_dates = calendar["date"].dropna()
 
+      
+        sales_last_date = sales_dates.max().date()
+        calendar_last_date = calendar_dates.max().date()
 
         # Forecast horizon
         forecast_days = st.number_input(
