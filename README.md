@@ -1,158 +1,103 @@
+# 📈 SalesPulse AI — Retail Sales Forecasting & Analytics
 
-# SalesPulse AI – Retail Sales Forecasting
+**SalesPulse AI** is an interactive retail sales forecasting application built with Python, Machine Learning, and Streamlit. It analyzes historical retail sales patterns and predicts aggregate daily unit sales for a selected future period.
 
- **Live App:** https://salespulse-ai.streamlit.app/
+🔗 **Live Demo:** https://salespulse-ai.streamlit.app/  
+💻 **GitHub Repository:** https://github.com/siddhisatav/SalesPulse-AI
 
- **GitHub Repository:** https://github.com/siddhisatav/SalesPulse-AI
+## ✨ Project Highlights
 
-## 1. Project Overview
+- Forecast aggregate daily unit sales for 1–28 days, subject to available calendar coverage.
+- Analyze historical sales data from the M5 retail dataset.
+- Engineer date-based, lag, rolling-average, and event-related features.
+- Compare five regression algorithms using MAE, RMSE, and R².
+- Explore forecasts through an interactive dashboard, charts, and summary cards.
+- Deploy the application using Streamlit Community Cloud.
 
-SalesPulse AI is a machine-learning-based retail sales forecasting application that predicts future daily sales using historical retail data.
+## 🛠️ Tech Stack
 
-The project demonstrates the complete workflow of a forecasting solution, including data preparation, feature engineering, model training, model evaluation, and interactive visualization using Streamlit.
+- **Language:** Python
+- **Data Analysis:** Pandas, NumPy
+- **Machine Learning:** Scikit-learn
+- **Dashboard:** Streamlit
+- **Interactive Visualization:** Plotly
+- **Model Storage:** Joblib / serialized model artifacts
+- **Version Control:** Git and GitHub
 
-## 2. Objectives
+## 📊 Dataset
 
-- Analyze historical retail sales patterns.
-- Calculate total daily sales across products and stores.
-- Create meaningful date-based and historical-sales features.
-- Train and compare multiple regression models.
-- Forecast future daily sales for a selected period.
-- Display forecasts and model performance through an interactive dashboard.
+The project uses the M5 retail sales dataset, including historical unit sales and calendar information.
 
-## 3. Technology Stack
+The sales data is aggregated across the included products and stores by date.
 
-- **Programming language:** Python
-- **Data analysis:** Pandas, NumPy
-- **Machine learning:** Scikit-learn
-- **Visualization:** Streamlit and the charting library used in the application
-- **Data format:** CSV
-- **Model storage:** Pickle (`.pkl`)
+**Forecast target:** `total_sales` — total units sold per day, not revenue in rupees.
 
-## 4. Dataset
+## ⚙️ Workflow
 
-The project uses the M5 retail sales dataset.
+1. **Data inspection:** Examine sales and calendar data for structure, missing values, duplicates, and sales patterns.
+2. **Data preparation:** Aggregate product-store sales into daily total unit sales.
+3. **Feature engineering:** Create calendar features, event indicators, historical lags, and rolling averages.
+4. **Model training and comparison:** Evaluate Linear Regression, K-Nearest Neighbors, Decision Tree, Random Forest, and Gradient Boosting regressors.
+5. **Model evaluation:** Compare models using Mean Absolute Error (MAE), Root Mean Squared Error (RMSE), and R².
+6. **Forecast generation:** Predict one day at a time and use each prediction to construct historical features for the next forecast day.
+7. **Dashboard development:** Display forecast results, summary statistics, and model comparisons in Streamlit.
 
-The relevant data files include:
+## 🧠 Feature Engineering
 
-- `sales_train_evaluation.csv` — historical unit sales for product-store combinations.
-- `calendar.csv` — dates and calendar or event information.
+The forecasting pipeline uses the following feature groups:
 
-The sales data is aggregated by date to calculate total daily sales across the included products and stores.
+**Calendar features**
+- Year, month, day, day of week, and week of year
+- Event-day indicator
 
-**Target variable:** `total_sales`
+**Historical sales features**
+- Lag features: 1, 7, 14, and 28 days
+- Rolling means: 7 and 28 days
 
-The target represents units sold, not sales revenue in currency.
+Lag features capture earlier sales values, while rolling means summarize recent sales patterns. Historical features must be calculated without using future actual sales.
 
-## 5. Data Processing and Feature Engineering
+## 🤖 Models Evaluated
 
-The project uses 12 input features:
+The project compares five regression models:
 
-### Date-based features
+| Model | Purpose |
+|---|---|
+| Linear Regression | Establish a simple regression baseline |
+| K-Nearest Neighbors | Compare predictions based on similar observations |
+| Decision Tree | Capture nonlinear patterns |
+| Random Forest | Combine multiple decision trees |
+| Gradient Boosting | Build an ensemble sequentially to improve predictions |
 
-- `year`
-- `month`
-- `day`
-- `day_of_week`
-- `week_of_year`
-- `is_event_day`
+**Final forecasting model:** Linear Regression in the current application.
 
-### Historical-sales features
+The dashboard displays the evaluation metrics for the compared models. Lower MAE and RMSE generally indicate smaller prediction errors, while a higher R² generally indicates a better fit on the evaluated dataset.
 
-- `lag_1`
-- `lag_7`
-- `lag_14`
-- `lag_28`
-- `rolling_mean_7`
-- `rolling_mean_28`
-
-Date-based features capture calendar patterns. Lag features represent sales from earlier periods, while rolling means summarize recent historical sales.
-
-Historical features should use only information available before the date being predicted.
-
-## 6. Machine Learning Models
-
-The project evaluates the following regression algorithms:
-
-- Linear Regression
-- K-Nearest Neighbors (KNN) Regressor
-- Decision Tree Regressor
-- Random Forest Regressor
-- Gradient Boosting Regressor
-
-Linear Regression is used as the saved final model in the current version of the project.
-
-## 7. Model Evaluation
-
-The models are evaluated using:
-
-- **MAE (Mean Absolute Error):** measures the average absolute difference between actual and predicted sales.
-- **RMSE (Root Mean Squared Error):** penalizes larger prediction errors more heavily.
-- **R² Score:** measures the variation in sales explained by the model relative to a mean-prediction baseline.
-
-Lower MAE and RMSE values generally indicate better predictions. An R² score closer to 1 generally indicates a better fit on the evaluated data.
-
-The final reported metrics should be taken from the same evaluation run used by the deployed application.
-
-## 8. Forecasting Approach
-
-The application generates forecasts for a selected number of days, subject to the available calendar data.
-
-It predicts one day at a time. Each prediction is added to the history used to calculate features for the next day. This is called recursive forecasting.
-
-Because later predictions depend on earlier predictions, forecasting errors can accumulate over longer horizons.
-
-## 9. Streamlit Application
-
-The application provides two main sections:
+## 📉 Dashboard Features
 
 ### Sales Forecast
-
-- Select the forecasting horizon.
+- Select a forecasting horizon.
 - Choose a supported forecast start date.
-- Generate daily sales predictions.
-- View predicted sales in a table and chart.
-- Review summary statistics for the forecast period.
+- Generate predicted daily unit sales.
+- Review average, maximum, and total forecast values.
+- Explore forecast results in a table and interactive chart.
 
 ### Model Performance
+- Compare the five evaluated regression models.
+- Review MAE, RMSE, and R².
+- Explore the R² comparison chart.
 
-- Compare the evaluated regression models.
-- Review MAE, RMSE, and R² scores.
-- View model performance through a chart.
-
-## 10. Project Structure
-
-```text
-SalesPulse-AI/
-├── app/
-│   └── app.py
-├── data/
-│   └── raw/
-│       ├── calendar.csv
-│       └── sales_train_evaluation.csv
-├── models/
-│   ├── salespulse_final_model.pkl
-│   └── salespulse_features.pkl
-├── notebooks/
-├── README.md
-├── requirements.txt
-└── .gitignore
-```
-
-## 11. Installation and Execution
+## 🚀 Run Locally
 
 ### Prerequisites
+- Python installed
+- Git installed
 
-- Python
-- Git (for repository management)
-- Required packages listed in `requirements.txt`
-
-### Setup
+### Installation
 
 Clone the repository:
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
+git clone https://github.com/siddhisatav/SalesPulse-AI.git
 cd SalesPulse-AI
 ```
 
@@ -168,26 +113,41 @@ Run the application from the project root:
 streamlit run app/app.py
 ```
 
-Replace `YOUR_GITHUB_REPOSITORY_URL` with the actual repository URL.
+The application should open in your browser. The model artifacts and required data files must be present at the paths expected by the application.
 
-## 12. Limitations
+## 📁 Project Structure
 
-- Forecasts depend on the quality and date coverage of the available data.
-- Recursive forecasting can accumulate errors across multiple days.
-- Predictions may not capture unexpected market changes or future events not represented in the input features.
-- The current calendar coverage limits the dates that the application can forecast.
+The repository contains the following main areas:
 
-## 13. Future Improvements
+- `app/` — Streamlit application
+- `data/raw/` — Raw sales and calendar data
+- `data/processed/` — Processed daily sales data
+- `final_models/` — Saved model and feature artifacts
+- `notebooks/` — Dataset inspection, analysis, and model development notebooks
+- `docs/` — Project documentation
+- `requirements.txt` — Python dependencies
 
-- Evaluate the model across additional chronological test periods.
-- Improve handling of seasonal patterns and special events.
-- Add additional model diagnostics and forecast uncertainty estimates.
-- Extend the application with more detailed store-level or product-level analysis where appropriate.
+## ⚠️ Limitations
+- Forecast dates are limited by the calendar data available to the application.
+- Aggregate forecasts do not identify which individual product or store will generate the sales.
 
-## 14. Conclusion
+## 🔮 Future Improvements
 
-SalesPulse AI demonstrates an end-to-end retail sales forecasting workflow using Python, feature engineering, regression models, and Streamlit. It combines historical sales analysis with an interactive application for exploring future sales estimates.
+- Evaluate performance across additional chronological test periods.
+- Add forecast uncertainty estimates.
+- Explore stronger seasonal and event-related features.
+- Add store-level and product-level forecasting.
+- Expand the dashboard with additional business insights.
 
-## 15. Disclaimer
+## 👩‍💻 What I Learned
 
-Forecasts are estimates based on historical patterns and available features. They should not be treated as guaranteed future sales.
+Through this project, I practiced data inspection, time-series feature engineering, regression model comparison, evaluation using multiple metrics, recursive forecasting, interactive dashboard development, and GitHub-based project deployment.
+
+## Disclaimer
+
+The forecasts are estimates based on historical data and available features. They are not guaranteed future sales.
+
+---
+
+**Built by Siddhi Satav**  
+Computer Engineering Graduate | Data Analytics & Machine Learning
