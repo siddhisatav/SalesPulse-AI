@@ -2,7 +2,13 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
+import plotly.express as px
 
+st.set_page_config(
+    page_title="SalesPulse AI",
+    page_icon="📈",
+    layout="wide"
+)
 
 # -----------------------------
 # Page configuration
@@ -69,11 +75,6 @@ with st.sidebar:
         "SalesPulse AI | Machine Learning Project"
     )
 
-st.set_page_config(
-    page_title="SalesPulse AI",
-    page_icon="",
-    layout="wide"
-)
 
 
 st.markdown("""
@@ -195,19 +196,27 @@ st.markdown("""
     }
 
     /* =========================
-       BUTTON
-       ========================= */
-
+        BUTTON
+        ========================= */
     .stButton > button {
         width: 100%;
-        background: #6366f1;
+        background: linear-gradient(90deg, #6366f1, #06b6d4);
         color: white;
         border: none;
-        border-radius: 9px;
-        padding: 11px 20px;
+        border-radius: 10px;
+        padding: 12px 20px;
         font-weight: 650;
         font-size: 15px;
-        transition: 0.2s;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.2);
+    }
+
+    .stButton > button:hover {
+        background: linear-gradient(90deg, #4f46e5, #0891b2);
+        color: white;
+        border: none;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(6, 182, 212, 0.25);
     }
 
     .stButton > button:hover {
@@ -238,11 +247,25 @@ st.markdown("""
        METRICS
        ========================= */
 
+        
     div[data-testid="stMetric"] {
-        background: #111827;
-        border: 1px solid #1f2937;
-        padding: 15px;
-        border-radius: 12px;
+        background: linear-gradient(145deg, #172338, #111827);
+        border: 1px solid #334155;
+        padding: 22px 20px;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+        transition: all 0.2s ease;
+    }
+
+    div[data-testid="stMetricLabel"] {
+        color: #94a3b8 !important;
+        font-size: 14px;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #38bdf8 !important;
+        font-size: 28px;
+        font-weight: 700;
     }
 
     div[data-testid="stMetricLabel"] {
@@ -455,17 +478,14 @@ model_performance = pd.DataFrame({
     ]
 })
 
-st.markdown(
-    '<div class="main-title">SalesPulse AI</div>',
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    '<div class="subtitle">'
-    'Retail Sales Forecasting & Analytics'
-    '</div>',
-    unsafe_allow_html=True
-)
+st.markdown("""
+<div class="main-title">📈 SalesPulse AI</div>
+<div class="subtitle">
+    Retail Sales Forecasting & Analytics
+    <br>
+    Turn historical sales data into actionable insights.
+</div>
+""", unsafe_allow_html=True)
 
 
 
@@ -632,11 +652,43 @@ if page == "Sales Forecast":
                         unsafe_allow_html=True
                     )
 
-                    st.line_chart(
-                        forecast_result.set_index("date")["predicted_sales"],
-                        use_container_width=True
+                                    
+                    fig = px.line(
+                        forecast_result,
+                        x="date",
+                        y="predicted_sales",
+                        markers=True,
+                        title="Predicted Daily Sales"
                     )
-                    
+
+                    fig.update_traces(
+                        line=dict(color="#38bdf8", width=3),
+                        marker=dict(size=7, color="#22d3ee"),
+                        hovertemplate=(
+                            "<b>Date:</b> %{x|%d %b %Y}<br>"
+                            "<b>Predicted Sales:</b> %{y:,.0f}"
+                            "<extra></extra>"
+                        )
+                    )
+
+                    fig.update_layout(
+                        template="plotly_dark",
+                        paper_bgcolor="#0b1120",
+                        plot_bgcolor="#111827",
+                        font=dict(color="#e5e7eb"),
+                        title=dict(
+                            text="Predicted Daily Sales",
+                            font=dict(size=22)
+                        ),
+                        xaxis_title="Forecast Date",
+                        yaxis_title="Predicted Units Sold",
+                        hovermode="x unified",
+                        margin=dict(l=20, r=20, t=65, b=20)
+                    )
+
+                    st.plotly_chart(fig, use_container_width=True)
+
+                                        
                    
 
                 except Exception as e:
@@ -650,10 +702,20 @@ elif page == "Model Performance":
 
     st.header("Model Performance Comparison")
 
-    st.write(
-        "Comparison of the machine-learning models "
-        "evaluated on the test dataset."
-    )
+    
+    st.markdown("""
+    <p style="color:#94a3b8; font-size:15px; line-height:1.7;">
+    Compare the models using three evaluation metrics:
+    <br>
+    <strong style="color:#38bdf8;">MAE</strong> — Average prediction error.
+    <br>
+    <strong style="color:#38bdf8;">RMSE</strong> — Gives more weight to larger errors.
+    <br>
+    <strong style="color:#38bdf8;">R² Score</strong> — Shows how well the model explains
+    the variation in sales; a higher score is generally better.
+    </p>
+    """, unsafe_allow_html=True)
+
 
     st.dataframe(
         model_performance.style.format({
@@ -664,11 +726,49 @@ elif page == "Model Performance":
         use_container_width=True
     )
 
+        
     st.subheader("R² Comparison")
 
-    r2_chart = model_performance.set_index(
-        "Model"
-    )["R2"]
+    fig = px.bar(
+        model_performance.sort_values("R2", ascending=True),
+        x="R2",
+        y="Model",
+        orientation="h",
+        text="R2",
+        title="Model Performance Comparison",
+        color="R2",
+        color_continuous_scale=["#334155", "#06b6d4", "#6366f1"]
+    )
 
-    st.bar_chart(r2_chart)    
-   
+    fig.update_traces(
+        texttemplate="%{text:.3f}",
+        textposition="outside",
+        hovertemplate="<b>%{y}</b><br>R² Score: %{x:.3f}<extra></extra>"
+    )
+
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="#0b1120",
+        plot_bgcolor="#111827",
+        font=dict(color="#e5e7eb"),
+        xaxis_title="R² Score",
+        yaxis_title="Model",
+        xaxis=dict(range=[0, 1]),
+        coloraxis_showscale=False,
+        margin=dict(l=20, r=50, t=65, b=20)
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
+st.markdown("""
+<hr style="border-color:#1e293b; margin-top:40px;">
+
+<div style="text-align:center; color:#64748b; font-size:13px; padding:10px;">
+    📈 <strong>SalesPulse AI</strong>
+    <br>
+    Retail Sales Forecasting & Analytics
+    <br>
+    Built with Python, Streamlit & Machine Learning
+</div>
+""", unsafe_allow_html=True)
