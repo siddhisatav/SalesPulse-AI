@@ -1,4 +1,9 @@
-# SalesPulse AI — Retail Sales Forecasting
+
+# SalesPulse AI – Retail Sales Forecasting
+
+ **Live App:** https://salespulse-ai.streamlit.app/
+
+ **GitHub Repository:** https://github.com/siddhisatav/SalesPulse-AI
 
 ## 1. Project Overview
 
